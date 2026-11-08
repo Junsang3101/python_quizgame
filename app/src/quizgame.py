@@ -58,6 +58,8 @@ class QuizGame:
         game = cls(quizzes)
         game.start()
 
-DATA_PATH = Path(__file__).parent.parent / 'data' / 'quizzes.json'
-quizzes = QuizLoader.load_quizzes_from_json(DATA_PATH)
-QuizGame.play(quizzes)
+# 그냥 이 모듈 실행시 퀴즈 게임을 시작하도록 함
+if __name__ == "__main__":
+    DATA_PATH = Path(__file__).parent.parent / 'data' / 'default_quizzes.json'
+    quizzes = QuizLoader.load_quizzes_from_json(DATA_PATH)
+    QuizGame.play(quizzes)
