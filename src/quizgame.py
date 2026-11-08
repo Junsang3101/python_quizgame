@@ -2,7 +2,7 @@ from pathlib import Path
 import json
 
 # 기본 퀴즈 파일 경로
-DATA_PATH = Path(__file__).parent.parent / 'data' / 'default_quizzes.json'
+DATA_PATH = Path(__file__).parent / 'data' / 'default_quizzes.json'
 
 '''
     quiz structure:

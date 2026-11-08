@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from quizgame import Quiz, QuizLoader, QuizGame, DATA_PATH
+from quizgame import QuizGame, QuizLoader, DATA_PATH
 
 
 class QuizGameCLI:
