@@ -1,9 +1,7 @@
 import json
 from pathlib import Path
-from quizgame import QuizGame, QuizLoader
+from quizgame import Quiz, QuizLoader, QuizGame, DATA_PATH
 
-# 기본 퀴즈 파일 경로
-DATA_PATH = Path(__file__).parent.parent / 'data' / 'default_quizzes.json'
 
 class QuizGameCLI:
     def __init__(self):
