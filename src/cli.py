@@ -1,13 +1,11 @@
-import json
-from pathlib import Path
-from enum import Enum, auto
-from quizgame import Quiz, QuizGame, QuizLoader, DEFAULT_QUIZZES_PATH
-
+from quizgame import QuizGame
+from quiz_repository import load_quizzes
+from quiz_repository import DEFAULT_QUIZZES_PATH
 
 class QuizGameCLI:
     def __init__(self):
         self.path = DEFAULT_QUIZZES_PATH
-        self.quizzes = QuizLoader.from_json(self.path)
+        self.quizzes = load_quizzes(self.path)
 
     def main_menu(self):
         while True:
@@ -47,11 +45,10 @@ class QuizGameCLI:
         return self.main_menu()
         
     def quiz_list(self):
+        print("\n=== 퀴즈 목록 ===")
         for idx, quiz in enumerate(self.quizzes, start=1):
             print(f"{idx}) {quiz.question}")
-
-        print("\n=== 퀴즈 목록 ===")
-        print("1. 퀴즈 추가")
+        print("\n1. 퀴즈 추가")
         print("2. 퀴즈 삭제")
         print("3. 퀴즈 전부 삭제")
         print("4. 퀴즈 초기화")
