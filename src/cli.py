@@ -32,20 +32,17 @@ class QuizGameCLI:
 
     def solve(self):
         quizgame = QuizGame(self.quizzes)
-        print("==== 퀴즈 풀기 ===")
-        for idx, quiz in enumerate(quizgame.quizzes, start=1):
-            print(f"{idx}) {quiz.question}")
-            for jdx, choice in enumerate(quiz.choices, start=1):
+        idx = 1
+        while not quizgame.is_finished:
+            current_quiz = quizgame.current_quiz
+            print(f"{idx}) {current_quiz.question}")
+            for jdx, choice in enumerate(current_quiz.choices, start=1):
                 print(f"    {jdx}. {choice}")
+            user_answer = input("선택: ")
+            quizgame.submit(current_quiz.choices[int(user_answer) - 1])
+            idx += 1
+            print("\n")
             
-            answer = quiz.choices[int(input("선택: "))-1]
-            result = quizgame.submit(quiz, answer)
-
-            if result:
-                print("정답!")
-            elif not result:
-                print("오답!")
-
         print(f"점수: {quizgame.score}/{len(quizgame.quizzes)}")        
         return self.main_menu()
         
