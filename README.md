@@ -11,22 +11,21 @@
 
 ```text
 python_quizgame
-│   .gitignore 
+│   .gitignore
 │   README.md
 │
 ├── evidence
-│       docker생성 및 git 초기화.md
-│       기본 브랜치 변경.png
-│       브랜치 만들고 변경.md
 │
 └── src
-    │   cli.py          # cli 기반 메뉴
-    │   quizgame.py     # 핵심 로직
-    │   __init__.py     # 패키지 표시
-    │   __main__.py     # 패키지 실행 진입점
+    │   cli.py          # CLI 메뉴와 사용자 입력·출력
+    │   quizgame.py     # 퀴즈 모델, 로더, 게임 로직 및 데이터 경로 상수
+    │   __init__.py     # src 패키지 표시
+    │   __main__.py     # CLI 실행 진입점
     │
     └── data
-            default_quizzes.json    # 기본 문제 5개
+            default_quizzes.json    # 기본 퀴즈 데이터
+            custom_quizzes.json     # 사용자 정의 퀴즈 데이터
+            score_history.json      # 점수 기록
 ```
 
 
