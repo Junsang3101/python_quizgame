@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 
 # 데이터 파일 경로
 DATA_DIR = Path(__file__).parent / 'data'
@@ -18,12 +18,19 @@ class Score:
     def from_dict(cls, score: dict):
         return cls(**score)
 
+    @property
+    def score(self) -> float:
+        return round(self.correct / self.number, 2)
+
+    @property
+    def __repr__(self):
+        return Score(self.score, self.number, self.correct)
+    
 JsonObject = dict[str, object]
 
-# json 내부가 리스트면 그대로 아니면 리스트로 리턴
+# json 내용물을 리스트화 한다
 def _as_list(data: JsonObject | list[JsonObject]) -> list[JsonObject]:
     return data if isinstance(data, list) else [data]
-
 
 # json 파일 읽기
 def load_json(path: Path) -> list[JsonObject]:
