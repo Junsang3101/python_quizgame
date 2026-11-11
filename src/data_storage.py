@@ -7,24 +7,6 @@ DATA_DIR = Path(__file__).parent / 'data'
 DEFAULT_QUIZZES_PATH = DATA_DIR / 'default_quizzes.json'
 QUIZZES_PATH = DATA_DIR / 'quizzes.json'
 SCORE_PATH = DATA_DIR / 'score.json'
-
-@dataclass
-class Score:
-    _score: int
-    number: int
-    correct: int
-
-    @classmethod
-    def from_dict(cls, score: dict):
-        return cls(**score)
-
-    @property
-    def score(self) -> float:
-        return round(self.correct / self.number, 2)
-
-    @property
-    def __repr__(self):
-        return Score(self.score, self.number, self.correct)
     
 JsonObject = dict[str, object]
 

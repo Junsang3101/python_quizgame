@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+# 퀴즈 구조체
 @dataclass
 class Quiz:
     question: str
@@ -8,18 +9,27 @@ class Quiz:
 
     # 클래스 메서드: 딕셔너리로부터 Quiz 인스턴스를 생성
     @classmethod
-    def from_dict(cls, quiz: Quiz):
+    def from_dict(cls, quiz):
         return cls(**quiz)
-
-    def get_question(self):
-        return self.question
-
-    def get_choices(self):
-        return self.choices
 
     def is_correct(self, user_answer: str):
         return self.answer == user_answer
 
+# 점수 구조체
+@dataclass
+class Score:
+    _score: int
+    number: int
+    correct: int
+
+    # 클래스 메서드: 딕셔너리로부터 Score 인스턴스를 생성
+    @classmethod
+    def from_dict(cls, score: dict):
+        return cls(**score)
+
+    @property
+    def score(self) -> float:
+        return round(self.correct / self.number, 2)
 
 # json 파일을 읽어서 Quiz 인스턴스 리스트로 변환하는 기능을 제공
 

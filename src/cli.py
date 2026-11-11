@@ -1,11 +1,17 @@
-from quizgame import QuizGame
-from data_storage import QuizRepository
+from quizgame import QuizGame, Quiz
 from data_storage import DEFAULT_QUIZZES_PATH
+from data_storage import add_json, load_json, write_json
 
 class QuizGameCLI:
     def __init__(self):
         self.path = DEFAULT_QUIZZES_PATH
-        self.quizzes = QuizRepository.load_quizzes(self.path)
+        self.quizzes = []
+        self.quizzes_update()
+
+    def print_quiz(self, i: int, quiz: Quiz):
+        print(f"{i}) {quiz.question}")
+        for i, choice in enumerate(quiz.choices, start=1):
+            print(f"    {i}. {choice}")
 
     def main_menu(self):
         while True:
@@ -30,15 +36,13 @@ class QuizGameCLI:
 
     def solve(self):
         quizgame = QuizGame(self.quizzes)
-        idx = 1
+        index = 1
         while not quizgame.is_finished:
-            current_quiz = quizgame.current_quiz
-            print(f"{idx}) {current_quiz.question}")
-            for jdx, choice in enumerate(current_quiz.choices, start=1):
-                print(f"    {jdx}. {choice}")
+            quiz = quizgame.current_quiz
+            self.print_quiz(index, quiz)
             user_answer = input("선택: ")
-            quizgame.submit(current_quiz.choices[int(user_answer) - 1])
-            idx += 1
+            quizgame.submit(quiz.choices[int(user_answer) - 1])
+            index += 1
             print("\n")
             
         print(f"점수: {quizgame.score}/{len(quizgame.quizzes)}")        
@@ -46,8 +50,8 @@ class QuizGameCLI:
         
     def quiz_list(self):
         print("\n=== 퀴즈 목록 ===")
-        for idx, quiz in enumerate(self.quizzes, start=1):
-            print(f"{idx}) {quiz.question}")
+        for i, quiz in enumerate(self.quizzes, start=1):
+            self.print_quiz(i, quiz)
         print("\n1. 퀴즈 추가")
         print("2. 퀴즈 삭제")
         print("3. 퀴즈 전부 삭제")
@@ -56,15 +60,35 @@ class QuizGameCLI:
 
         user_choice = input("선택:")
         if user_choice == '1':
-            pass
+            self.quiz_add()
         elif user_choice == '2':
-            pass
+            self.quiz_remove()
         elif user_choice == '3':
             pass
         elif user_choice == '4':
             pass
         elif user_choice == '5':
             return self.main_menu()
+
+    def quiz_add(self):
+        print("=== 퀴즈 추가===")
+        question = input("문제: ")
+        choices = []
+        choices.append(input("1. "))
+        choices.append(input("2. "))
+        choices.append(input("3. "))
+        choices.append(input("4. "))
+        answer = choices[int(input("정답 번호: ")) - 1]
+        add_json(self.path, {"question": question, "choices": choices, "answer": answer})
+        self.quizzes_update()
+        return self.main_menu()
+
+    def quiz_remove(self):
+        print("=== 퀴즈 삭제 ===")
+        print("")
+
+    def quizzes_update(self):
+        self.quizzes = [Quiz.from_dict(quiz) for quiz in load_json(self.path)]
 
     def run(self):
             self.main_menu()
