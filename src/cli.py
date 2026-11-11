@@ -1,11 +1,11 @@
 from quizgame import QuizGame
-from quiz_repository import load_quizzes
-from quiz_repository import DEFAULT_QUIZZES_PATH
+from data_storage import QuizRepository
+from data_storage import DEFAULT_QUIZZES_PATH
 
 class QuizGameCLI:
     def __init__(self):
         self.path = DEFAULT_QUIZZES_PATH
-        self.quizzes = load_quizzes(self.path)
+        self.quizzes = QuizRepository.load_quizzes(self.path)
 
     def main_menu(self):
         while True:

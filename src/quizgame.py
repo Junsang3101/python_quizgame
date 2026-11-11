@@ -1,16 +1,5 @@
 from dataclasses import dataclass
 
-
-'''
-    quiz structure:
-    [{
-        "question": str,
-        "choices": [str],
-        "answer": str
-    }]
-
-'''
-
 @dataclass
 class Quiz:
     question: str
@@ -19,7 +8,7 @@ class Quiz:
 
     # 클래스 메서드: 딕셔너리로부터 Quiz 인스턴스를 생성
     @classmethod
-    def from_dict(cls, quiz):
+    def from_dict(cls, quiz: Quiz):
         return cls(**quiz)
 
     def get_question(self):
@@ -28,7 +17,7 @@ class Quiz:
     def get_choices(self):
         return self.choices
 
-    def is_correct(self, user_answer:str):
+    def is_correct(self, user_answer: str):
         return self.answer == user_answer
 
 
