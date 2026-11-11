@@ -1,6 +1,6 @@
 from quizgame import QuizGame, Quiz
 from data_storage import DEFAULT_QUIZZES_PATH
-from data_storage import add_json, load_json, write_json
+from data_storage import add_json, load_json, remove_json
 
 class QuizGameCLI:
     def __init__(self):
@@ -81,11 +81,16 @@ class QuizGameCLI:
         answer = choices[int(input("정답 번호: ")) - 1]
         add_json(self.path, {"question": question, "choices": choices, "answer": answer})
         self.quizzes_update()
-        return self.main_menu()
+        return self.quiz_list()
 
     def quiz_remove(self):
         print("=== 퀴즈 삭제 ===")
-        print("")
+        self.quizzes_update()
+        for i, quiz in enumerate(self.quizzes, start=1):
+            print(f"{i}) {quiz.question}")
+        choice = int(input("선택: "))
+        remove_json(self.path, choice - 1)
+        self.quiz_list()
 
     def quizzes_update(self):
         self.quizzes = [Quiz.from_dict(quiz) for quiz in load_json(self.path)]
