@@ -1,1 +1,52 @@
-[]
+[
+  {
+    "question": "파이썬에서 함수를 정의할 때 사용하는 키워드는 무엇인가요?",
+    "choices": [
+      "func",
+      "def",
+      "function",
+      "lambda"
+    ],
+    "answer": "def"
+  },
+  {
+    "question": "순서가 있고 수정할 수 있는 항목 모음을 저장하는 자료형은 무엇인가요?",
+    "choices": [
+      "tuple",
+      "set",
+      "list",
+      "dict"
+    ],
+    "answer": "list"
+  },
+  {
+    "question": "len('Python')의 결과는 무엇인가요?",
+    "choices": [
+      "5",
+      "6",
+      "7",
+      "오류"
+    ],
+    "answer": "6"
+  },
+  {
+    "question": "파이썬에서 한 줄 주석을 시작할 때 사용하는 기호는 무엇인가요?",
+    "choices": [
+      "//",
+      "/*",
+      "#",
+      "--"
+    ],
+    "answer": "#"
+  },
+  {
+    "question": "예외를 처리할 때 사용하는 키워드는 무엇인가요?",
+    "choices": [
+      "catch",
+      "except",
+      "handle",
+      "error"
+    ],
+    "answer": "except"
+  }
+]
