@@ -1,5 +1,4 @@
 from quizgame import QuizGameManager, Quiz, EmptyQuizzesError
-from typing import Type
 from pathlib import Path
 
 PATH = Path(__file__).parent / 'data'
