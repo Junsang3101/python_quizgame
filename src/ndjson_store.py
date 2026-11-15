@@ -4,9 +4,6 @@ from typing import Type, Any
 
 JsonObject = dict[str, object]
 
-def _as_list(data: JsonObject | list[JsonObject]) -> list[JsonObject]:
-    return data if isinstance(data, list) else [data]
-
 def find_in_root(directory_path: str | Path, filename: str) -> Path | None:
     dir_path = Path(directory_path)
     file_path = dir_path / filename
@@ -35,13 +32,21 @@ def load_items(path: Path, target_type: Type[Any]) -> list[JsonObject]:
             line = line.strip()
             if not line: # 빈 줄은 무시
                 continue
+            elif line is None:
+                continue
 
             try:
                 # 한 줄 꺼냄 
                 data = json.loads(line)
 
                 # 타겟이 아니면 스킵
-                if not isinstance(data, target_type) or data == None:
+                if  data == None:
+                    print(
+                        f"경고: {path}의 {line_num}번째 줄 데이터 타입이"
+                        f" {type(data).__name__}, 비어있습니다."
+                    )
+                    continue
+                elif not isinstance(data, target_type):
                     print(
                         f"경고: {path}의 {line_num}번째 줄 데이터 타입이"
                         f" {type(data).__name__}입니다. ({target_type.__name__}이"
@@ -56,22 +61,25 @@ def load_items(path: Path, target_type: Type[Any]) -> list[JsonObject]:
     return items
 
 
-def write_items(path: Path, data: JsonObject | list[JsonObject]) -> None:
-    items = _as_list(data)
+def write_items(path: Path, datas: list[JsonObject]) -> None:
     with open(path, "w", encoding="utf-8") as target:
-        #json.dump(items, target, ensure_ascii=False, indent=None, default=str)
-        for item in items:
+        for item in datas:
             # 객체면 __dict__로, 딕셔너리뷰면 그대로 JSON 문자열로 변환 후 줄바꿈 추가
             data = item.__dict__ if hasattr(item, "__dict__") else item
             target.write(json.dumps(data, ensure_ascii=False) + "\n")
 
-def add_items(path: Path, data: JsonObject | list[JsonObject]) -> None:
-    new_items = _as_list(data)
-    existing_items = load_items(path, dict) if path.exists() else []
-    existing_items.extend(new_items)
-    write_items(path, existing_items)
+def write_item(path: Path, data: JsonObject) -> None:
+    write_items(path, [data])
 
-def remove_item(path: Path, index: int) -> None:
-    items = load_items(path)
+def add_items(path: Path, items: list[JsonObject]) -> None:
+    with open(path, "a", encoding="utf-8") as target:
+        for item in items:
+            target.write(json.dumps(item, ensure_ascii=False) + "\n")
+
+def add_item(path: Path, item: JsonObject) -> None:
+    add_items(path, [item])
+
+def remove_item(path: Path, index: int, target_type: Type[Any]) -> None:
+    items = load_items(path, target_type)
     items.pop(index)
     write_items(path, items)

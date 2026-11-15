@@ -4,7 +4,8 @@ from dataclasses import dataclass, asdict
 from pathlib import Path
 import random
 from typing import Type
-from ndjson_store import go_or_create_in_root, load_items, add_items, remove_item, write_items
+from uuid import uuid4
+from ndjson_store import go_or_create_in_root, load_items, add_item, remove_item, write_item
 
 @dataclass
 class Quiz:
@@ -53,7 +54,7 @@ class Score:
     @property
     def to_string(self):
         result = [f"점수: {self.score}점 {self.correct}/{self.number} | 힌트: {self.hint}/{self.number}"]
-        result.append(f"날자: {self.time}")
+        result.append(f"날짜: {self.time}")
         return "\n".join(result)
 
     def __eq__(self, other: Score):
@@ -79,21 +80,10 @@ class QuizGameManager:
         self.highest_score: Score = None
         self.update()
 
-    def __del__(self):
-        temp_high = self.highest_score
-        temp_scores = self.scores
-        if temp_high != None:
-            temp_high.time = temp_high.time.isoformat()
-        for score in self.scores:
-            score.time = score.time.isoformat()
-        write_items(self._quizzes_path, self.quizzes)
-        write_items(self._highest_path, temp_high)
-        write_items(self._scores_path, temp_scores)
-
     def update(self):
         self._quizzes_path = go_or_create_in_root(self.root_path, "quizzes.ndjson")
         self._scores_path = go_or_create_in_root(self.root_path, "scores.ndjson")
-        self._highest_path = go_or_create_in_root(self.root_path, "highest_score.ndjson")
+        self._highest_path = go_or_create_in_root(self.root_path, "highest.ndjson")
 
         self.quizzes = []
         for data in load_items(self._quizzes_path, dict):
@@ -113,18 +103,27 @@ class QuizGameManager:
                 self.highest_score = Score.from_dict(raw_data[0])
 
     def quiz_add(self, quiz: Quiz):
-        add_items(self._quizzes_path, asdict(quiz))
+        add_item(self._quizzes_path, asdict(quiz))
         self.update()
 
     def quiz_remove(self, index: int):
-        remove_item(self._quizzes_path, index)
+        remove_item(self._quizzes_path, index, dict)
         self.update()
 
     def save_score(self, score: Score):
-        add_items(self._scores_path, asdict(score))
-        if self.highest_score == None or self.highest_score < score:
-            write_items(self._highest_path, asdict(score))
-            self.highest_score = Score.from_dict(score)
+        if self.scores == []:
+            write_item(self._scores_path, asdict(score))
+            write_item(self._highest_path, asdict(score))
+        else:
+            add_item(self._scores_path, asdict(score))
+        if self.highest_score is not None and self.highest_score < score:
+            write_item(self._highest_path, score)
+            self.highest_score = score
+        self.update()
+
+    def scores_reset(self):
+        write_item(self._scores_path, None)
+        write_item(self._highest_path, None)
         self.update()
 
     def start(self) -> QuizGame:
@@ -166,7 +165,7 @@ class QuizGame:
     def score(self) -> Score:
         now = datetime.now(ZoneInfo("Asia/Seoul"))
         if self.hint_counter != 0:
-            new_score = Score( ( (self.correct - (self.hint / 2) ) / self.number) * 100, self.number, self.correct, self.hint_counter,  now.isoformat())
+            new_score = Score( round(( (self.correct - (self.hint_counter / 2) ) / self.number) * 100, 2), self.number, self.correct, self.hint_counter,  now.isoformat())
             return new_score
         new_score = Score(int((self.correct / self.number) * 100), self.number, self.correct, self.hint_counter,  now.isoformat())
         return new_score
@@ -183,7 +182,6 @@ class QuizGame:
             self.hint_counter += 1
         if self.quizzes[self.index].is_correct(submit) or \
             self.quizzes[self.index].is_correct(self.quizzes[self.index].choices[submit - 1]):
-
             self.correct +=1 
             return True
         else:
