@@ -4,10 +4,12 @@ from pathlib import Path
 PATH = Path(__file__).parent / 'data'
 
 def run():
+    '''시작'''
     manager = QuizGameManager(PATH)
     main_menu(manager)
 
 def main_menu(manager: QuizGameManager):
+    '''메인 메뉴'''
     print("\n=== 메인 메뉴 ====")
     print("1. 퀴즈 시작")
     print("2. 퀴즈 목록")
@@ -38,6 +40,7 @@ def main_menu(manager: QuizGameManager):
         return main_menu(manager)
 
 def start_menu(manager: QuizGameManager):
+    '''퀴즈 풀기'''
     try:
         quizgame = manager.start()
     except EmptyQuizzesError:
@@ -65,6 +68,7 @@ def start_menu(manager: QuizGameManager):
     return main_menu(manager)
 
 def list_menu(manager: QuizGameManager):
+    '''퀴즈 목록'''
     print("\n=== 퀴즈 목록 ===")
     for i, quiz in enumerate(manager.quizzes, start=1):
         print(f"{quiz.to_string(i, True, True)}\n")
@@ -88,6 +92,7 @@ def list_menu(manager: QuizGameManager):
         return list_menu(manager)
 
 def add_menu(manager: QuizGameManager):
+    '''퀴즈 추가'''
     try:
         new_quiz = Quiz(input("질문: "), [], None, "")
         for i in range(1, 5, 1):
@@ -101,6 +106,7 @@ def add_menu(manager: QuizGameManager):
     return list_menu(manager)
 
 def remove_menu(manager: QuizGameManager):
+    '''퀴즈 삭제'''
     try:
         choice = int(input("삭제 (0 = 취소): ")) - 1
     except (TypeError, IndexError, ValueError):
@@ -113,6 +119,7 @@ def remove_menu(manager: QuizGameManager):
     return list_menu(manager)
 
 def score_list(manager: QuizGameManager):
+    '''기록 보기'''
     print("\n=== 기록 ===")
     for score in manager.scores:
         print(f"{score.to_string}\n")
