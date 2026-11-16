@@ -1,4 +1,4 @@
-from quizgame import QuizGameManager, Quiz, EmptyQuizzesError
+from .quizgame import QuizGameManager, Quiz, EmptyQuizzesError
 from pathlib import Path
 
 PATH = Path(__file__).parent / 'data'
@@ -119,7 +119,3 @@ def score_list(manager: QuizGameManager):
     if manager.highest_score != None:
         print(f"\n=== 최고 점수 ===\n{manager.highest_score.to_string}")
     return main_menu(manager)
-
-# 그냥 이 모듈 실행시 퀴즈 게임을 시작하도록 함
-if __name__ == "__main__":
-    run()
