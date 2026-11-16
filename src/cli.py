@@ -42,9 +42,13 @@ def main_menu(manager: QuizGameManager):
 def start_menu(manager: QuizGameManager):
     '''퀴즈 풀기'''
     try:
-        quizgame = manager.start()
+        request = int(input("문제 수(0 = 전부):"))
+        quizgame = manager.start(request)
     except EmptyQuizzesError:
         print("퀴즈가 하나도 없습니다.")
+        return main_menu(manager)
+    except ValueError:
+        print("다시 입력해주세요.")
         return main_menu(manager)
     quizgame.shuffle()
     while True:

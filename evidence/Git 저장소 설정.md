@@ -1,6 +1,6 @@
 # 컨테이너 생성 및 테스트
 
-전 미션 응용할 겸 파이썬 퀴즈 게임을 도커 안에서 실행하도록 도커 컨테이너를 구성하였습니다.
+이전 미션 응용할 겸 파이썬 퀴즈 게임을 도커 안에서 실행하도록 도커 컨테이너를 구성하였습니다.
 
 ```powershell
 PS E:\git_repo\python_quizgame> docker compose up -d --build
