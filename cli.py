@@ -1,5 +1,4 @@
 from .quizgame import QuizGameManager, Quiz, EmptyQuizzesError
-from .json_store import save_json
 from pathlib import Path
 
 
@@ -18,11 +17,16 @@ def main_menu(manager: QuizGameManager):
     print("3. 기록")
     print("4. 기록 초기화")
     print("5. 종료")
+
     try:
         choice = int(input("선택 : "))
-    except:
-        print("\n--<다시 입력해주세요>--")
+    except ValueError:
+        print("다시 입력해주세요.")
         return main_menu(manager)
+    except (KeyboardInterrupt, EOFError):
+        manager.save()
+        print("게임을 종료합니다.\n")
+
     if choice == 1:
         return start_menu(manager)
     elif choice == 2:
@@ -51,14 +55,21 @@ def start_menu(manager: QuizGameManager):
     except ValueError:
         print("다시 입력해주세요.")
         return start_menu(manager)
+    except (KeyboardInterrupt, EOFError):
+        manager.save()
+        print("게임을 종료합니다.\n")
+
     quizgame.shuffle()
     while True:
         print(f"\n{quizgame.quiz}")
         try:
             choice = int(input("선택 (0 = 힌트): "))
         except ValueError, IndexError:
-            print("\n--<다시 입력해주세요>--")
-            return start_menu(manager)
+            print("테스트 종료")
+            return main_menu(manager)
+        except (KeyboardInterrupt, EOFError):
+            manager.save()
+            print("게임을 종료합니다.\n")
         if choice == 0:
             quizgame.hint = True
             continue
@@ -83,8 +94,11 @@ def list_menu(manager: QuizGameManager):
     try:
         choice = int(input("선택: "))
     except ValueError:
-        print("--<다시 입력해주세요>--")
+        print("다시 입력해주세요.")
         return list_menu(manager)
+    except (KeyboardInterrupt, EOFError):
+        manager.save()
+        print("게임을 종료합니다.\n")
               
     if choice == 1:
         add_menu(manager)
@@ -93,7 +107,7 @@ def list_menu(manager: QuizGameManager):
     elif choice == 3:
         return main_menu(manager)
     else:
-        print("--<다시 입력해주세요>--")
+        print("다시 입력해주세요.")
         return list_menu(manager)
 
 def add_menu(manager: QuizGameManager):
@@ -105,7 +119,11 @@ def add_menu(manager: QuizGameManager):
         new_quiz.hint = input("힌트: ")
         new_quiz.answer = input("정답: ")
     except ValueError:
-        print("--<퀴즈 추가 취소>--")
+        print("퀴즈 추가 취소")
+        return list_menu(manager)
+    except (KeyboardInterrupt, EOFError):
+        manager.save()
+        print("게임을 종료합니다.\n")
     
     manager.quiz_add(new_quiz)
     return list_menu(manager)
@@ -120,6 +138,9 @@ def remove_menu(manager: QuizGameManager):
     except (TypeError, IndexError, ValueError):
         print("다시 입력해주세요 (0 = 취소): ")
         return remove_menu(manager)
+    except (KeyboardInterrupt, EOFError):
+        manager.save()
+        print("게임을 종료합니다.\n")
     
     return list_menu(manager)
 

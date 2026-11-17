@@ -1,43 +1,7 @@
-# 컨테이너 생성 및 테스트
-
-이전 미션 응용할 겸 파이썬 퀴즈 게임을 도커 안에서 실행하도록 도커 컨테이너를 구성하였습니다.
-
-```powershell
-PS E:\git_repo\python_quizgame> docker compose up -d --build
-[+] Building 1.9s (13/13) FINISHED                                                                     
- => [internal] load local bake definitions                                                        0.0s
- => => reading from stdin 525B                                                                    0.0s
- => [internal] load build definition from Dockerfile                                              0.0s
- => => transferring dockerfile: 189B                                                              0.0s
- => [internal] load metadata for docker.io/library/python:3.10.0-slim                             1.2s
- => [auth] library/python:pull token for registry-1.docker.io                                     0.0s
- => [internal] load .dockerignore                                                                 0.0s
- => => transferring context: 2B                                                                   0.0s
- => [1/5] FROM docker.io/library/python:3.10.0-slim@sha256:ad540a471260fee5e5e1a99ee2acf142efe8c  0.0s
- => => resolve docker.io/library/python:3.10.0-slim@sha256:ad540a471260fee5e5e1a99ee2acf142efe8c  0.0s
- => [internal] load build context                                                                 0.0s
- => => transferring context: 116B                                                                 0.0s
- => CACHED [2/5] WORKDIR /app                                                                     0.0s
- => CACHED [3/5] COPY requirements.txt .                                                          0.0s
- => CACHED [4/5] RUN pip install --no-cache-dir -r requirements.txt                               0.0s
- => CACHED [5/5] COPY . .                                                                         0.0s
- => exporting to image                                                                            0.1s
- => => exporting layers                                                                           0.0s
- => => exporting manifest sha256:6275dd0fdb487413b4b687f696e1547d6c20391b219b6e86ecdb7924fd6e92d  0.0s
- => => exporting config sha256:402ebc11e65bfee894640b250212d0959543772144e2964c0935cd085a9eedea   0.0s
- => => exporting attestation manifest sha256:c83fe30e0d0c751413b7d13d7a1711855c5b3d931109232002d  0.0s
- => => exporting manifest list sha256:3cfff6ae8e704902036fb555cbbafd0baa5e8b39bfe086e758af3cb8ef  0.0s
- => => naming to docker.io/library/python_quizgame-app:latest                                     0.0s
- => => unpacking to docker.io/library/python_quizgame-app:latest                                  0.0s
- => resolving provenance for metadata file                                                        0.0s
-[+] up 2/2
- ✔ Image python_quizgame-app       Built                                                           2.1s
- ✔ Container python_quizgame-app-1 Started                                                         0.3s
-PS E:\git_repo\python_quizgame>
-```
-
 # Git init / commit / push
 
+본래 도커에서 만들어 보려다 불필요 한 것 같아 제외하였습니다.
+  
 Github에 빈 저장소를 만든 뒤 로컬 환경에서 `git init` 으로 초기화 한 뒤 `git switch -c main` 로 새 브랜치를 만들어 `git add .` 로 스태이징 한 후 `git commit -m` 로 커밋을 만든 뒤 `git remote add` 로 `git push` 할 위치를 잡아준 후 `git push -u origin main` 로 첫 푸쉬해 upstream 설정을 해주었습니다.
 
 ``` powershell
@@ -97,3 +61,100 @@ To https://github.com/junsang3101/python_quizgame.git
 branch 'main' set up to track 'origin/main'.
 PS E:\git_repo\python_quizgame> 
 ```
+
+# 필요 없는 도커 삭제후 스태이징
+
+도커 복습 목적으로 도커 안에서 만들고 있었으나, 불필요해 삭제하고 `git add` 해줌
+
+```powershell
+PS E:\git_repo\python_quizgame> git add .
+PS E:\git_repo\python_quizgame> git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        deleted:    .env
+        new file:   .gitignore
+        deleted:    app/Dockerfile
+        deleted:    compose.yaml
+        renamed:    app/src/__init__.py -> src/__init__.py
+        renamed:    app/requirements.txt -> src/__main__.py
+        renamed:    app/src/cli.py -> src/cli.py
+        renamed:    app/data/default_quizzes.json -> src/data/default_quizzes.json
+        renamed:    app/src/quizgame.py -> src/quizgame.py
+```
+
+# commit 해서 새 브랜치로 push 함
+
+커밋하고 새 브랜치에 커밋했음
+
+```powershell
+PS E:\git_repo\python_quizgame> git commit -m "파이썬 말고 필요없는 도커 버림" 
+[main 386f642] 파이썬 말고 필요없는 도커 버림
+ 9 files changed, 7 insertions(+), 21 deletions(-)
+ delete mode 100644 .env
+ create mode 100644 .gitignore
+ delete mode 100644 app/Dockerfile
+ delete mode 100644 compose.yaml
+ rename {app/src => src}/__init__.py (100%)
+ rename app/requirements.txt => src/__main__.py (100%)
+ rename {app/src => src}/cli.py (84%)
+ rename {app => src}/data/default_quizzes.json (100%)
+ rename {app/src => src}/quizgame.py (94%)
+PS E:\git_repo\python_quizgame> git switch -c python-only
+Switched to a new branch 'python-only'
+PS E:\git_repo\python_quizgame> git branch
+  main
+* python-only
+PS E:\git_repo\python_quizgame> git status 
+On branch python-only
+nothing to commit, working tree clean
+PS E:\git_repo\python_quizgame> git push -u origin python-only
+Enumerating objects: 10, done.
+Counting objects: 100% (10/10), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (6/6), done.
+Writing objects: 100% (9/9), 2.35 KiB | 800.00 KiB/s, done.
+Total 9 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: This repository moved. Please use the new location:
+remote:   https://github.com/Junsang3101/python_quizgame.git
+remote: 
+remote: Create a pull request for 'python-only' on GitHub by visiting:
+remote:      https://github.com/Junsang3101/python_quizgame/pull/new/python-only
+remote: 
+To https://github.com/junsang3101/python_quizgame.git
+ * [new branch]      python-only -> python-only
+branch 'python-only' set up to track 'origin/python-only'.
+```
+
+# 기존 브랜치가 가르키는 commit 제거
+
+`git switch -c` 전에 커밋해서 기존 main 브랜치에 커밋이 남아버림,  
+그래서 기존 브랜치의 커밋을 `git reset --keep origin/main`으로 지워줌  
+기본 브랜치 또한 GitHub 에서 변경해줌
+
+```powershell
+PS E:\git_repo\python_quizgame> git branch -vv
+  main        386f642 [origin/main: ahead 1] 파이썬 말고 필요없는 도커 버림
+* python-only 386f642 [origin/python-only] 파이썬 말고 필요없는 도커 버림
+PS E:\git_repo\python_quizgame> git switch main
+Switched to branch 'main'
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+PS E:\git_repo\python_quizgame> git reset --keep origin/main
+PS E:\git_repo\python_quizgame> git branch -vv
+* main        ae2ac83 [origin/main] cli 메뉴 모듈을 만들고 .gitignore 추가함 quizzes.json 도 default_quiz.json으로 수정함
+  python-only 386f642 [origin/python-only] 파이썬 말고 필요없는 도커 버림
+PS E:\git_repo\python_quizgame> git switch python-only
+Switched to branch 'python-only'
+Your branch is up to date with 'origin/python-only'.
+PS E:\git_repo\python_quizgame> git status 
+On branch python-only
+Your branch is up to date with 'origin/python-only'.
+
+nothing to commit, working tree clean
+PS E:\git_repo\python_quizgame> 
+```
+
+![기본 브랜치 변경](../evidence/기본%20브랜치%20변경.png)
