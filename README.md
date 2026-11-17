@@ -7,20 +7,34 @@
 
 **목적**: 프로그래밍 배우기의 일환으로 Python 과 Git 을 활용하여 프로그램을 만들기 기록하고 내가 만든 프로그램이 왜 이렇게 동작하는지 설명할 수 있게 되는 것입니다.
 
+**기능 목록**:  
+
+- 메인 메뉴
+  - 퀴즈 풀기
+    - 퀴즈 섞어짐
+    - 퀴즈 수 선택
+  - 퀴즈 목록 보기
+    - 퀴즈 추가
+    - 퀴즈 삭제
+  - 점수 기록 보기
+  - 점수 기록 초기화
+
 ## 1. 파일 구조
 
-```text
-python_quizgame
-│   .gitignore              # git 무시할 파일/디렉토리
-│   README.md
-│
-└── src
-      cli.py                # CLI 메뉴와 사용자 입력·출력
-      quizgame.py           # 게임 로직
-      __init__.py           # src 패키지 표시
-      __main__.py           # CLI 실행 진입점
-      default_quizzes.json  # 기본 퀴즈
-      state_json            # 상태 저장
+본래 `/python_quizgame/src/data` 구조로 바꾸었으나, 미션에서 외부 파일에 상태를 저장하라 한 부분에서  
+미션 저장소가 퀴즈게임 모듈로써 사용할 수 있게 하라고 이해해 단순하게 해봤습니다.
+
+```powershell
+└─python_quizgame
+    │  .gitignore
+    │  cli.py
+    │  default_quizzes.json
+    │  json_store.py
+    │  quizgame.py
+    │  README.md
+    │  state.json
+    │  __init__.py
+    └─ __main__.py
 ```
 
 ## 2. 프로그램 구조
@@ -36,6 +50,8 @@ python_quizgame
 `json_store`: json 저장 모듈  
 - `load_json`, `save_json`, `s_load_json`: 전자 둘은 `with open` 및 `json` 를 결합한 래퍼 함수고, 후자는 파일이 깨졌을 경우에 백업한다
 
+[데이터 구조](evidence/데이터%20구조.md)
+
 소스 코드
 - [ndjson_store](json_store.py)
 - [quizgame](quizgame.py)
@@ -43,7 +59,7 @@ python_quizgame
 
 ## 3. 실행 방법
 
-메인 프로젝트 경로 `python_quizgame/` 에서 `python -m python_quizgame`를 해주세요.
+메인 프로젝트 경로 `python_quizgame/`의 이전 경로에서 `python -m python_quizgame`를 해주세요.
 
 ## 4. 수행 목록
 
@@ -54,13 +70,13 @@ python_quizgame
 - [x] [공통 입력 및 예외 처리](evidence/공통%20입력%20및%20예외%20처리.md)
 - [x] [퀴즈 클래스](/evidence/퀴즈%20클래스.md)
 - [x] [기본 퀴즈 데이터](evidence/기본%20퀴즈%20데이터.md)
-- [ ] [퀴즈 풀기 (브랜치 merge 실습)](evidence/브랜치%20실습.md)
-- [x] 퀴즈 저장
-- [x] 퀴즈 목록
-- [x] 점수 확인
-- [x] QuizGame 클래스
-- [x] 파일 저장/불러오기
-- [ ] [Git 저장소 복제 실습]()
+- [x] [퀴즈 풀기 (브랜치 merge 실습)](evidence/브랜치%20실습.md)
+- [x] [퀴즈 저장](evidence/퀴즈%20저장.md)
+- [x] [퀴즈 목록](evidence/퀴즈%20목록.md)
+- [x] [점수 확인](evidence/점수%20확인.md)
+- [x] [QuizGame 클래스](evidence/QuizGame%20클래스.md)
+- [x] [파일 저장/불러오기](evidence/파일%20저장%20및%20불러오기.md)
+- [x] [Git 저장소 복제 실습](evidence/Git%20복제%20실습.md)
 
 ### 5-1. 선택
 
@@ -142,3 +158,21 @@ def score_list(manager: QuizGameManager):
         print(f"\n=== 최고 점수 ===\n{manager.highest.to_string}")
     return main_menu(manager)
 ```
+
+# 6. 느낀점
+
+**어떻게 문제를 해결할 것인가**  
+- 처음에는 전 미션 도커를 활용해볼까? 하고 도커로도 만들어 보고  
+미션 세부 요구사항을 읽지 않고 설계 없이 퀴즈 게임을 만들기 시작해 자주 뜯어 고치고  
+ndjson 은 셀프 힐링이 간단하다 하여 ndjson으로 모듈 다 만들었다가 json 으로 다시 고치고,  
+중간의 메소드/함수/클래스 이름 등 마음에 안 드는 부분이 생길 때마다 자주 바꿔 스스로 할 일을 만드는 등 굉장히 많은 시간이 들었습니다. 
+
+- 현재는 저장소를 바로 파이썬 모듈로 사용하고싶어 도커를 떼버렸는데, 도커가 있으면 환경 설정이 편해 나쁘지 않았을 것 같습니다.
+
+- 결과적으로 이번 미션을 하면서 미션이 있으면 먼저 미션의 요구사항이 뭔지 분석을 하고 어떤식으로 구현할지 
+ai 를 통해 디자인 패턴 등 조언을 구해가며 스텁을 활용해서 탑다운 방식으로 만드는 걸 지향할 것 같습니다.  
+
+- 이번 미션은 대부분 의도하지 않고 우연히 디자인 패턴을 사용해 내 코드를 제대로 이해하지 않고있다는 느낌을 받았습니다.
+
+**커밋을 언제 하는가**  
+- 작업 중간 중간 언제 커밋을 해야할지 헤매 보통 vscode 를 끄기 전이나 커밋을 하였는데, 요구사항에 있었던대로 클래스 함수 등 실행 가능한 단위가 완성이 되면 하면 되겠다고 느끼기도 꼇습니다.
