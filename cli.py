@@ -1,7 +1,9 @@
 from .quizgame import QuizGameManager, Quiz, EmptyQuizzesError
+from .json_store import save_json
 from pathlib import Path
 
-PATH = Path(__file__).parent / 'data'
+
+PATH = Path(__file__).parent / 'statesssss.json'
 
 def run():
     '''시작'''
@@ -29,11 +31,10 @@ def main_menu(manager: QuizGameManager):
         return score_list(manager)
     elif choice == 4:
         manager.scores_reset()
-        print("점수 기록이 초기화되었습니다.")
+        print("\n점수 기록이 초기화되었습니다.")
         return main_menu(manager)
     elif choice == 5:
-        manager.update()
-        manager.save_score
+        manager.save()
         print("게임을 종료합니다.\n")
     else:
         print("--<다시 입력해주세요>--")
@@ -49,15 +50,15 @@ def start_menu(manager: QuizGameManager):
         return main_menu(manager)
     except ValueError:
         print("다시 입력해주세요.")
-        return main_menu(manager)
+        return start_menu(manager)
     quizgame.shuffle()
     while True:
-        print(f"\n{quizgame.question}")
+        print(f"\n{quizgame.quiz}")
         try:
             choice = int(input("선택 (0 = 힌트): "))
         except ValueError:
             print("\n--<다시 입력해주세요>--")
-            continue
+            return start_menu(manager)
         if choice == 0:
             quizgame.hint = True
             continue
@@ -113,13 +114,13 @@ def remove_menu(manager: QuizGameManager):
     '''퀴즈 삭제'''
     try:
         choice = int(input("삭제 (0 = 취소): ")) - 1
+        if choice == -1:
+            return list_menu(manager)
+        manager.quiz_remove(choice)
     except (TypeError, IndexError, ValueError):
         print("다시 입력해주세요 (0 = 취소): ")
         return remove_menu(manager)
     
-    if choice == -1:
-        return list_menu(manager)
-    manager.quiz_remove(choice)
     return list_menu(manager)
 
 def score_list(manager: QuizGameManager):
@@ -127,6 +128,6 @@ def score_list(manager: QuizGameManager):
     print("\n=== 기록 ===")
     for score in manager.scores:
         print(f"{score.to_string}\n")
-    if manager.highest_score != None:
-        print(f"\n=== 최고 점수 ===\n{manager.highest_score.to_string}")
+    if manager.highest != None:
+        print(f"\n=== 최고 점수 ===\n{manager.highest.to_string}")
     return main_menu(manager)
