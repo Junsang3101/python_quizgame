@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone, timedelta   # 시간
 import json
+import shutil
 from dataclasses import dataclass, asdict   # dataclass 및 객체 전환(asdict)
 from pathlib import Path        # 경로
 import random                   # 무작위
@@ -30,7 +31,11 @@ class Quiz: # 퀴즈
 
     def is_correct(self, user_answer: str | int):
         '''점답 확인'''
-        return True if self.answer == user_answer or self.answer == self.choices[int(user_answer)] else False
+        if isinstance(user_answer, int):
+            if user_answer > len(self.choices):
+                return False
+            return self.answer == self.choices[user_answer]
+        return self.answer == user_answer
 
     def to_string(self, index, get_hint: bool, get_answer: bool):
         '''퀴즈 정보를 문자열로 리턴'''
@@ -86,28 +91,39 @@ class QuizGameManager:
     '''퀴즈, 점수 관리 및 게임 시작'''
     def __init__(self, root_path: Path):
         self.root_path = root_path
+        self.state_data: dict["quizzes": list[dict], "scores": list[dict], "highest": dict] = {}
+        self.quizzes: list[Quiz] = []
+        self.scores: list[Score] = []
+        self.highest: Score = None
+
+        if not root_path.exists():  # 파일이 없는 경우 만듦
+            root_path.parent.mkdir(parents=True, exist_ok=True)
+            save_json(root_path, None)
+
         try:
             self.data = load_json(self.root_path)
-            self.state_data: dict["quizzes": list[dict], "scores": list[dict], "highest": dict] = self.data
-            self.quizzes: list[Quiz] = [Quiz.from_dict(quiz) for quiz in self.state_data["quizzes"]]
-            self.scores: list[Score] = [Score.from_dict(score) for score in self.state_data["scores"]]
-            self.highest = self.state_data["highest"]
+        except json.decoder.JSONDecodeError:    # 파일 읽기 실패할 경우 기존 파일 백업한 후 작성
+            backup_path = self.root_path.parent / "backup"
+            backup_path.mkdir(parents=True, exist_ok=True)
+            file_name = f"{now.isoformat().replace(':', '-')}.json"
+            shutil.copy2(root_path, backup_path / file_name)
+            self.data = None
 
-        except FileNotFoundError:
-            # 파일이 없는 경우 만듦
-            save_json(root_path)
-            self.state_data = {}
-            self.quizzes = []
-            self.scores = []
-            self.highest = None
+        self.state_data = self.data or {}
+        if self.state_data is not None:
+            temp_quizzes = self.state_data.get("quizzes") or []
+            temp_scores = self.state_data.get("scores") or []
+            self.quizzes = [Quiz.from_dict(quiz) for quiz in temp_quizzes]
+            self.scores = [Score.from_dict(score) for score in temp_scores]
+            self.highest = self.state_data.get("highest")
 
-        except json.decoder.JSONDecodeError:
-            # 파일 읽기 실패할 경우
-            save_json(root_path)
-            self.state_data = {}
-            self.quizzes = []
-            self.scores = []
-            self.highest = None
+        if not len(self.quizzes):
+            default_quizzes = self.root_path.parent/"default_quizzes.json"
+            if not default_quizzes.exists():
+                print("기본 퀴즈가 존재하지 않습니다.")
+                return
+            self.quizzes = [Quiz.from_dict(quiz) for quiz in load_json(default_quizzes)]
+            print("기본 퀴즈를 가져왔습니다.")
 
     def quiz_add(self, quiz: Quiz):
         '''퀴즈 추가'''
@@ -134,10 +150,8 @@ class QuizGameManager:
     def save(self):
         self.state_data["quizzes"] = [asdict(quiz) for quiz in self.quizzes]
         temp_score = self.scores
-        for score in temp_score:
-            score.time = score.time.isoformat()
         self.state_data["scores"] = [asdict(score) for score in temp_score]
-        self.state_data["highest"] = self.highest
+        self.state_data["highest"] = asdict(self.highest) if self.highest else None
         save_json(self.root_path, self.state_data)
 
     def start(self, request: int = 0) -> QuizGame:
@@ -151,7 +165,7 @@ class QuizGame:
     '''퀴즈 게임의 상태 저장, 문제 수를 요청받음 입력이 없으면 모든 문제
     퀴즈 리스트에 직접 접근하게 하지 않고 index 필드와 next()메소드를 통해 다음 문제로 가는 방식으로 설계함'''
     def __init__(self, quizzes: list[Quiz], request: int = 0):
-        self.quizzes = quizzes
+        self.quizzes: list[Quiz] = quizzes
         self.request = request
         self.correct = 0
         self.index = 0
@@ -197,9 +211,19 @@ class QuizGame:
     def submit(self, submit: str | int):    # 정답 제출
         if self.hint == True:
             self.hint_counter += 1
-        if self.quizzes[self.index].is_correct(submit) or \
-            self.quizzes[self.index].is_correct(self.quizzes[self.index].choices[submit - 1]):
-            self.correct +=1
-            return True
+
+        if isinstance(submit, int):
+            submit -= 1
+            if submit > len(self.quizzes[self.index].choices):
+                return False
+            print(submit, len(self.quizzes[self.index].choices))
+            result = self.quizzes[self.index].is_correct(self.quizzes[self.index].choices[submit])
         else:
-            return False 
+            result = self.quizzes[self.index].is_correct(submit)
+
+        if result:
+            self.correct += 1
+            return True
+        
+        return False
+        

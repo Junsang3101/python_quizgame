@@ -3,7 +3,7 @@ from .json_store import save_json
 from pathlib import Path
 
 
-PATH = Path(__file__).parent / 'statesssss.json'
+PATH = Path(__file__).parent / 'state.json'
 
 def run():
     '''시작'''
@@ -56,7 +56,7 @@ def start_menu(manager: QuizGameManager):
         print(f"\n{quizgame.quiz}")
         try:
             choice = int(input("선택 (0 = 힌트): "))
-        except ValueError:
+        except ValueError, IndexError:
             print("\n--<다시 입력해주세요>--")
             return start_menu(manager)
         if choice == 0:
