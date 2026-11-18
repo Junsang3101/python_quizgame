@@ -23,7 +23,7 @@ class Quiz: # 퀴즈
     choices: list[str]
     answer: str
     hint: str
-
+    
     @classmethod
     def from_dict(cls, quiz):
         '''딕셔너리를 퀴즈로 읽기'''
@@ -152,14 +152,17 @@ class QuizGameManager:
     def save(self):
         '''상태 정보 파일로 저장'''
         self.state_data["quizzes"] = [asdict(quiz) for quiz in self.quizzes]
-        if self.scores is not None:
+        if isinstance(self.scores, list):
             for score in self.scores:
-                score.time = score.time.isoformat()
+                if isinstance(score.time, datetime):
+                    score.time = score.time.isoformat()
             self.state_data["scores"] = [asdict(score) for score in self.scores]
-        if isinstance(self.highest, Score):
-            self.highest.time = self.highest.time.isoformat()
+        if self.highest is not None:
+            if isinstance(self.highest.time, datetime):
+                self.highest.time = self.highest.time.isoformat()
             self.state_data["highest"] = asdict(self.highest)
-        self.state_data["highest"] = self.highest
+        else:
+            self.state_data["highest"] = self.highest
         save_json(self.root_path, self.state_data)
 
     def start(self, request: int = 0) -> QuizGame:
@@ -173,7 +176,7 @@ class QuizGame:
     '''퀴즈 게임의 상태 저장, 문제 수를 요청받음 입력이 없으면 모든 문제
     퀴즈 리스트에 직접 접근하게 하지 않고 index 필드와 next()메소드를 통해 다음 문제로 가는 방식으로 설계함'''
     def __init__(self, quizzes: list[Quiz], request: int = 0):
-        self.quizzes: list[Quiz]
+        self.quizzes: list[Quiz] = quizzes
         self.correct = 0
         self.index = 0
         self.hint = False
@@ -181,8 +184,7 @@ class QuizGame:
         if request == 0:
             self.quizzes = quizzes
         elif isinstance(request, int) and request <= self.end:
-            self.quizzes = random.sample(quizzes)
-        print(len(quizzes), request, self.end)
+            self.quizzes = random.sample(quizzes, request)
 
     @property
     def is_finished(self):
@@ -228,11 +230,9 @@ class QuizGame:
             self.hint_counter += 1
 
         if isinstance(submit, int):
-            submit -= 1
             if submit > len(self.quizzes[self.index].choices):
                 return False
-            print(submit, len(self.quizzes[self.index].choices))
-            result = self.quizzes[self.index].is_correct(self.quizzes[self.index].choices[submit])
+            result = self.quizzes[self.index].is_correct(self.quizzes[self.index].choices[submit-1])
         else:
             result = self.quizzes[self.index].is_correct(submit)
 

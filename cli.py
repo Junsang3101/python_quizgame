@@ -26,6 +26,7 @@ def main_menu(manager: QuizGameManager):
     except (KeyboardInterrupt, EOFError):
         manager.save()
         print("게임을 종료합니다.\n")
+        return
 
     if choice == 1:
         return start_menu(manager)
@@ -58,18 +59,20 @@ def start_menu(manager: QuizGameManager):
     except (KeyboardInterrupt, EOFError):
         manager.save()
         print("게임을 종료합니다.\n")
+        return
 
     quizgame.shuffle()
     while True:
         print(f"\n{quizgame.quiz}")
         try:
             choice = int(input("선택 (0 = 힌트): "))
-        except ValueError, IndexError:
+        except (ValueError, IndexError):
             print("테스트 종료")
             return main_menu(manager)
         except (KeyboardInterrupt, EOFError):
             manager.save()
             print("게임을 종료합니다.\n")
+            return
         if choice == 0:
             quizgame.hint = True
             continue
@@ -99,6 +102,7 @@ def list_menu(manager: QuizGameManager):
     except (KeyboardInterrupt, EOFError):
         manager.save()
         print("게임을 종료합니다.\n")
+        return
               
     if choice == 1:
         add_menu(manager)
@@ -124,6 +128,7 @@ def add_menu(manager: QuizGameManager):
     except (KeyboardInterrupt, EOFError):
         manager.save()
         print("게임을 종료합니다.\n")
+        return
     
     manager.quiz_add(new_quiz)
     return list_menu(manager)
@@ -141,6 +146,7 @@ def remove_menu(manager: QuizGameManager):
     except (KeyboardInterrupt, EOFError):
         manager.save()
         print("게임을 종료합니다.\n")
+        return
     
     return list_menu(manager)
 
