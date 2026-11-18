@@ -65,7 +65,7 @@
 
 ### 4-1. 필수 
 
-- [실행 화면 및 `git log --oneline --graph` 출력물](evidence/git%20log%20--oneline%20--graph%20출력물.png)
+- [실행 화면 및 `git log --oneline --graph` 출력물](evidence/실행%20화면%20및%20gitlog%20출력물.md)
 
 - [x] [Git 저장소 설정](/evidence/Git%20저장소%20설정.md)
 - [x] [메뉴 기능](evidence/메뉴%20설명.md)
